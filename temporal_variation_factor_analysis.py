@@ -6,7 +6,7 @@ Created on Sat Sep 19 17:21:42 2020
 """
 
 #temporal_variation_factor_analysis
-#!pip install factor_analyzer
+!pip install factor_analyzer
 from factor_analyzer import FactorAnalyzer
 import pandas as pd
 import numpy as np
@@ -59,24 +59,25 @@ data["Regime"] = data["Regime"].replace(["Equal"], "Medium")
 chemstoplot = ["DOC", "DO", "TOC", "Nitrogen"]
 data["cov"] = data ["Time_series"]
 
-data  = pd.read_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper1/Figurecodes/mass_flux_sensitivity_generalized.csv", sep="\t")
+data  = pd.read_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper2/Figurecodes/mass_flux_sensitivity_generalized_19022021.csv")#, sep="\t")
 
 data["timtrace"] = data ["Time_series"]
 data["chem_factors"] = data ["Chem"]
 data["Pe"] = data ["Regime"]
 data.replace(cleanup_tim, inplace = True)
 
-dadata = pd.read_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper1/Figurecodes/Conc_da_ss.csv", sep = "\t")
+dadata = pd.read_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper1/Figurecodes/Da_29012021_95pcloss.csv")#, sep = "\t")
 
-mdata = pd.merge(data, dadata[["Regime", "Trial", "Chem", "%reldelmassflux", "%fraction_rel_delmf"]], on = ["Regime", "Trial", "Chem"])
-mdata.loc[mdata["PeDa"] > 40, "PeDamark"] = 3
-mdata.loc[(mdata["PeDa"] > 20) & (mdata["PeDa"] < 40), "PeDamark"] = 2
-mdata.loc[(mdata["PeDa"] > 1) & (mdata["PeDa"] < 20), "PeDamark"] = 1
-mdata.loc[mdata["PeDa"] < 1, "PeDamark"] = 0
-labels = {0 : "Da/Pe < 1",
-          1 : "1 < Da/Pe < 15",
-          2 : "15 < Da/Pe < 40",
-          3 : "Da/Pe > 40"}
+mdata = pd.merge(data, dadata[["Regime", "Trial", "Chem", "reldelmassflux", "temporal_reldelmassflux_base"]], on = ["Regime", "Trial", "Chem"])
+mdata["logDa"] = np.log10(mdata.Da63)
+mdata.loc[mdata["logDa"] > 0.5, "PeDamark"] = 3
+mdata.loc[(mdata["logDa"] > 0) & (mdata["logDa"] < 0.5), "PeDamark"] = 2
+mdata.loc[(mdata["logDa"] > -1) & (mdata["logDa"] < 0), "PeDamark"] = 1
+mdata.loc[mdata["logDa"] < -1, "PeDamark"] = 0
+labels = {0 : "logDa < -1",
+          1 : "-1 < logDa < 0",
+          2 : "1 < logDa < 0.5",
+          3 : "logDa > 0.5"}
 
 corrMatrix = mdata.drop(['Unnamed: 0', 'Unnamed: 0.1', 'Sensitivity%', 'Sensitivitybase%', 'PeDamark', 'sensbase', 'timtrace', 'chem_factors', 'Time_series'], axis = 1).corr()
 sns.heatmap(corrMatrix, annot = True)
@@ -93,7 +94,7 @@ for k in ['pearson', 'kendall', 'spearman']:
 
 #Subset of the data, the 14 columns containing the survey answers
 
-features = ['conc_Da', 'Pe', '%reldelmassflux', 'cov', 'timtrace','Time', 'PeDa', '%fraction_rel_delmf']
+features = ['Da63', 'Pe', 'reldelmassflux', 'cov', 'timtrace','Time', 'logDa', 'temporal_reldelmassflux_base']
 yfeature = 'chem_factors'
 x = mdata[features+ [yfeature]] 
 fa = FactorAnalyzer(2, rotation = 'varimax')

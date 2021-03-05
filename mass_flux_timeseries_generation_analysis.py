@@ -29,6 +29,7 @@ vardict = proc.speciesdict("Saturated")
 gvarnames = list(t for t in vardict.keys() if vardict[t]["Location"]=="Mobile") + ["Nitrogen", "TOC"]
 
 parent_directory = "E:/Zenodo_temporal_dynamics"
+output_directory = "Y:/Home/khurana/4. Publications/Restructuring/Paper2/Figurecodes"
 #Sensitivity
 row = []
 for Reg in reginvest:
@@ -55,27 +56,21 @@ ampbth = pd.merge(sensitivitydata, tracerdata[["Trial", "Regime", "fraction", "T
 ampbth["Sensitivity%"] = ampbth["Sensitivity"] * 100
 ampbth["Sensitivitybase%"] = ampbth["Sensitivitybase"] * 100
 
-ampbth.to_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper2/Figurecodes/normalized_sensivity_19022021.csv", sep="\t")
+ampbth.to_csv(os.path.join(output_directory, "normalized_sensivity_19022021.csv"))
 
 import numpy as np
 import pandas as pd
 import data_reader.data_processing as proc
-import analyses.saturated_transient as sta
+import analyses.transient as ta
 
 #set up basic constants 
 Regimes = ["Slow", "Equal", "Fast"]
-domains = ["Original", "Half", "Double", "Big"]
-domainodes = {"Original": {'ynodes' : 51},
-              "Big" : {'ynodes' : 126},
-              "Double" : {'ynodes' : 101},
-              "Half" : {'ynodes' : 26}}
 scdict = proc.masterscenarios() #master dictionary of all spatially heterogeneous scenarios that were run
 
 # Scenarios to investigate:
 Trial = list(scdict.keys())
 #Trial = ["H", "37", "38", "39", "40", "41", "42", "43", "44", "45"]
 reginvest = Regimes
-domaininvest = list(domainodes.keys())[:1]
 
 vardict = proc.speciesdict("Saturated")
 States = ["Active", "Inactive"]
@@ -84,27 +79,19 @@ gvarnames = list(t for t in vardict.keys() if vardict[t]["State"] in (States))
 #Sensitivity
 row = []
 for Reg in reginvest:
-    for domain in domaininvest:
-        if domain != "Original":
-            domadd = domain + "_"
-        else:
-            domadd = ""
-        benchmark = np.load("D:/Saturated_flow/EGUGoldschmidtdataset6/" + domadd + Reg + "AR_0/NS-AH/NS-AH_df.npy")
-        for t in ["1", "2", "5"]:
-#            directory = "//tsclient/D/Saturated_flow/EGUGoldschmidtdataset6/" + domadd + Reg + "AR_" + t + "/"
-            directory = "D:/Saturated_flow/EGUGoldschmidtdataset6/" + domadd + Reg + "AR_" + t + "/"
-            #directory = "X:/Saturated_flow/changedkindox_transient/" + domadd + Reg + "AR_" + t + "/"#change directory as per flow regime
-            print (Reg, domain, t)
-            for j in Trial:
-                if ((j == '52' and t == "5") or (j == '43' and t == "1")):
-                    pass
-                else:
-                    data = np.load(directory + "NS-A"+j+"/NS-A"+j+"_df.npy")
-                    amplitude, ampmax, baseamp, basemax = sta.mass_norm_amplitude(data, benchmark, 0, -1, 0, -1, domainodes[domain]['ynodes'], gvarnames, "Saturated")
-                    for g in gvarnames:
-                        row.append([j,scdict[j]['Het'], scdict[j]['Anis'], domain, Reg, t, g, amplitude[gvarnames.index(g)], ampmax[gvarnames.index(g)], baseamp[gvarnames.index(g)], baseamp[gvarnames.index(g)]])
+    benchmark = np.load(os.path.join(parent_directory, Reg + "AR_0_NS-AH_df.npy"))
+    for t in ["1", "2", "5"]:
+        print (Reg, t)
+        for j in Trial:
+            if ((j == '52' and t == "5") or (j == '43' and t == "1")):
+                pass
+            else:
+                data = np.load(os.path.join(parent_directory, Reg + "AR_"+str(t)+"_NS-A"+str(j)+"_df.npy"))
+                amplitude, ampmax, baseamp, basemax = ta.mass_norm_amplitude(data, benchmark, 0, -1, 0, -1, 51, gvarnames, "Saturated")
+                for g in gvarnames:
+                    row.append([j,scdict[j]['Het'], scdict[j]['Anis'], Reg, t, g, amplitude[gvarnames.index(g)], ampmax[gvarnames.index(g)], baseamp[gvarnames.index(g)], baseamp[gvarnames.index(g)]])
 
-sensitivitydata = pd.DataFrame.from_records (row, columns = ["Trial", "Variance", "Anisotropy", "Domain", "Regime", "Time_series", "Chem", "Sensitivity", "Sensitivitybase"])
+sensitivitydata = pd.DataFrame.from_records (row, columns = ["Trial", "Variance", "Anisotropy", "Regime", "Time_series", "Chem", "Sensitivity", "Timloc_max", "Sensitivitybase", "Timloc_maxbase"])
 
 tracerdata = pd.read_csv("Z:/tracer_combined_05032020.csv", sep = "\t")
 
@@ -113,10 +100,10 @@ ampbth = pd.merge(sensitivitydata, tracerdata[["Trial", "Regime", "fraction", "T
 ampbth["Sensitivity%"] = ampbth["Sensitivity"] * 100
 ampbth["Sensitivitybase%"] = ampbth["Sensitivitybase"] * 100
 
-ampbth.to_csv("Z:/Normalized_RMSamplitude_biomass.csv", sep="\t")
+ampbth.to_csv(os.path.join(output_directory, "Normalized_RMSamplitude_biomass_190022021.csv"))
 
 #Sensitivity comparison
-head_path = "Y:/Home/khurana/4. Publications/Restructuring/Paper2/Figurecodes/headatinlet.csv"
+head_path = os.path.join(output_directory, "headatinlet.csv")
 head = pd.read_csv(head_path, sep = ",")
 cov1 = np.round(np.cov(head["H1"]),2)
 cov2 = np.round(np.cov(head["H2"]),2)
@@ -134,9 +121,8 @@ cov3tim = np.where(stattools.acf(head["H3"], fft = True, nlags = 5476) < 0.75)[0
 path_da_data = "Y:/Home/khurana/4. Publications/Restructuring/Paper1/Figurecodes/Da_29012021_95pcloss.csv"
 da = pd.read_csv(path_da_data, sep = ",")
 
-directory = r"Y:\Home\khurana\4. Publications\Restructuring\Paper2\Figurecodes\/"
-filename = "Normalized_RMSamplitude_chem.csv"
-sens = pd.read_csv(directory + filename, sep="\t")
+filename = "normalized_sensivity_19022021.csv"
+sens = pd.read_csv(os.path.join(output_directory, filename))
 sens["Regime"] = sens["Regime"].replace(["Equal"], "Medium")
 
 print(da.columns)
@@ -159,7 +145,46 @@ for t in [1,2,5]:
 
 data["Senssquared"] = data["Sensitivitybase%"]/data["sensbase"]
 
-data.to_csv("Y:/Home/khurana/4. Publications/Restructuring/Paper2/Figurecodes/mass_flux_sensitivity_generalized_30012021.csv", sep="\t")
+data.to_csv(os.path.join(output_directory, "mass_flux_sensitivity_generalized_19022021.csv"))
+
+head_path = os.path.join(output_directory, "headatinlet.csv")
+head = pd.read_csv(head_path, sep = ",")
+cov1 = np.round(np.cov(head["H1"]),2)
+cov2 = np.round(np.cov(head["H2"]),2)
+cov3 = np.round(np.cov(head["H3"]),2)
+
+from statsmodels.tsa import stattools
+cov1 = np.round(stattools.acovf(head["H1"], fft = True),2)[0]
+cov2 = np.round(stattools.acovf(head["H2"], fft = True),2)[0]
+cov3 = np.round(stattools.acovf(head["H3"], fft = True),2)[0]
+
+cov1tim = np.where(stattools.acf(head["H1"], fft = True, nlags = 5476) < 0.75)[0][0]
+cov2tim = np.where(stattools.acf(head["H2"], fft = True, nlags = 5476) < 0.75)[0][0]
+cov3tim = np.where(stattools.acf(head["H3"], fft = True, nlags = 5476) < 0.75)[0][0]
+
+filename = "Normalized_RMSamplitude_biomass_190022021.csv"
+data = pd.read_csv(os.path.join(output_directory, filename))
+data["Regime"] = data["Regime"].replace(["Equal"], "Medium")
+
+print(sens.columns)
+
+data["cov"]=data["Time_series"]
+data["cov"]=data["cov"].replace([1], cov1)
+data["cov"]=data["cov"].replace([2], cov2)
+data["cov"]=data["cov"].replace([5], cov3)
+
+gvarnames = data.Chem.unique().tolist()
+reglist = data.Regime.unique().tolist()
+
+for t in [1,2,5]:
+    for r in reglist:
+        for g in gvarnames:
+            base = data[(data["Time_series"]==t) & (data["Regime"]==r) & (data["Chem"]==g) & (data["Trial"]=='H')]["Sensitivitybase%"].values[0]
+            data.loc[(data.Regime == r) & (data.Chem == g) & (data.Time_series == t), 'sensbase'] = base
+
+data["Senssquared"] = data["Sensitivitybase%"]/data["sensbase"]
+
+data.to_csv(os.path.join(output_directory, "biomass_sensitivity_generalized_19022021.csv"))
 
 #Cross-correlation
 
