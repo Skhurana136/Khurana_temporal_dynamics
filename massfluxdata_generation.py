@@ -51,7 +51,7 @@ for Reg in Regimes:
 massfluxdata = pd.DataFrame.from_records (row, columns = ["Trial", "Variance", "Anisotropy", "Domain", "Regime", "Time_series", "Chem", "delmassflux", "reldelmassflux", "normmassflux"])
 
 #Load tracer data
-path_tr_data = "Z:/tracer_combined_05032020.csv"
+path_tr_data = os.path.join(output_dir, "tracer_combined_05032020.csv")
 tr_data = pd.read_csv(path_tr_data, sep = "\t")
 tr_data.columns
 

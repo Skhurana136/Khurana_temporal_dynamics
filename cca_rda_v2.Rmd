@@ -1,0 +1,141 @@
+---
+title: "CCA_temp_dynamics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library (vegan)
+library (tidyverse)
+
+raw_dir = "E:/Zenodo_temporal_dynamics"
+
+biomass_vars <- c("Immobile.active.aerobic.degraders",
+               "Immobile.active.nitrate.reducers",
+               "Immobile.active.ammonia.oxidizers",
+               "Mobile.active.aerobic.degraders",
+               "Mobile.active.nitrate.reducers",
+               "Mobile.active.ammonia.oxidizers",
+               "Immobile.inactive.aerobic.degraders",
+               "Immobile.inactive.nitrate.reducers",
+               "Immobile.inactive.ammonia.oxidizers",
+               "Mobile.inactive.aerobic.degraders",
+               "Mobile.inactive.nitrate.reducers",
+               "Mobile.inactive.ammonia.oxidizers")
+chem_vars <- c("DOC", "DO", "TOC", "Ammonium","Nitrogen","Variance","Anisotropy","Normalised_vel")
+
+mf_path <- "E:/Zenodo_temporal_dynamics/pca_chem.csv"
+biomass_path <- "E:/Zenodo_temporal_dynamics/pca.csv"
+
+mf_data <- read.csv(mf_path)
+biomass_data <- read.csv(biomass_path)
+```
+## Attempt #1 with Canoninal correspondence analysis
+
+Throwing everything I have for CCA and visualising it
+
+```{r}
+cca1 <- cca(biomass_data[, biomass_vars] ~ ., data = mf_data[, chem_vars])
+```
+### R Variable information analysis on the variables
+
+```{r}
+cca1final <- ordistep(cca1, scope=formula(cca1))
+vif.cca(cca1final)
+```
+### Shortlist variables
+
+```{r}
+cca1 <- cca(biomass_data[, biomass_vars] ~ DOC+DO+Variance+Anisotropy+Normalised_vel, data = mf_data)
+cca1final <- ordistep(cca1, scope=formula(cca1))
+vif.cca(cca1final)
+```
+### Running ANOVA on shortlisted variables
+
+```{r}
+anova(cca1final)
+```
+
+
+### Plots
+
+First plotting everything
+
+```{r, echo=FALSE}
+cca1.plot <- plot(cca1final)
+cca1.plot
+```
+
+The plot is crowded with too many points. Just plot the environment variables and species.
+
+```{r, echo=FALSE}
+cca12.plot <- plot(cca1final, display=c("species","cn"))
+cca12.plot
+
+```
+
+## Attempt #2 with a different biomass list
+
+```{r}
+biomass_vars_active <- c("Immobile.active.aerobic.degraders",
+               "Immobile.active.nitrate.reducers",
+               "Immobile.active.ammonia.oxidizers",
+               "Mobile.active.aerobic.degraders",
+               "Mobile.active.nitrate.reducers",
+               "Mobile.active.ammonia.oxidizers")
+cca2 <- cca(biomass_data[, biomass_vars_active] ~ DOC+DO+Variance+Anisotropy+Normalised_vel, data = mf_data)
+cca2final <- ordistep(cca2, scope=formula(cca2))
+vif.cca(cca2final)
+```
+### Analysis of explanable variance
+```{r}
+anova(cca2final, by ="term", permutations = 0)
+```
+```{r}
+anova(cca2final, by ="term", permutations = 0)
+```
+```
+
+### Plots
+First plotting everything
+
+```{r, echo=FALSE}
+cca2.plot <- plot(cca2final)
+cca2.plot
+```
+
+The plot is crowded with too many points. Just plot the environment variables and species.
+
+```{r, echo=FALSE}
+cca22.plot <- plot(cca2final, display=c("species","cn"), scaling=3)
+cca22.plot
+```
+From Legendre and Legendre, Developments in Ecological Modeling:
+We begin with 2 datasets: X and Y. X is environmental variables while Y is species variables.
+We underdake direct comparison of X and Y since X intervenes in the calculation, forcing the ordination vectors to be maximally related to combinations of the variabels in X. This is canonical analysis.
+
+Among canonical analyses, we have the option to undertake symmetric or asymmetric analyses.
+- asymmetric
+  * RDA, CCA, LDA
+  * When X explains Y
+  * RDA to do an inverse analysis to explain Y (environmental variables) by X (species matrix now), preserves Euclidean distance
+  * CCA when you want to see how well X (environmental variables) explain Y (species matrix), preserves chi squared distance
+  * LDA when you want to see how X explains different groups of Y- results in classification of Y
+- symmetric:
+  * CCorA, Procusts analysis, co-interia analysis
+  * when X and Y are related with each other and they explain each other (?)
+  * An analysis of X by Y and an analysis of Y by X will produce the same result
+  * CCorA preserves Mahalanobis distance (?)
+  * Procusts and co-inertia analysis preserves euclidean distance
+  
+  
+
