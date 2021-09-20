@@ -1,0 +1,52 @@
+|-------------- Written with ogs5py --------------|
+#POINTS
+0 0.0 0.0 0.0 $NAME POINT0
+1 10.0 0.0 0.0
+2 10.0 10.0 0.0
+3 0.0 10.0 0.0
+4 0.3 0.0 0.0 $NAME POINT1
+5 0.3 0.5 0.0 $NAME POINT2
+6 0.0 0.5 0.0 $NAME POINT3
+#POLYLINE
+  $NAME
+   boundary
+  $POINTS
+   0
+   1
+   2
+   3
+   0
+#POLYLINE
+  $NAME
+   PLY_BC_RIGHT
+  $EPSILON
+   0.0001
+  $POINTS
+   4
+   5
+#POLYLINE
+  $NAME
+   PLY_BC_LEFT
+  $EPSILON
+   0.0001
+  $POINTS
+   0
+   6
+#POLYLINE
+  $NAME
+   PLY_BC_TOP
+  $EPSILON
+   0.0001
+  $POINTS
+   6
+   5
+#POLYLINE
+  $NAME
+   PLY_BC_BOT
+  $EPSILON
+   0.0001
+  $POINTS
+   0
+   4
+#STOP
+|-- Written with ogs5py (0.6.1) on: 2019-03-07_09-14-23 --|

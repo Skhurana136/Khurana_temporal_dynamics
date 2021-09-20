@@ -1,0 +1,16 @@
+|-------------- Written with ogs5py --------------|
+#FLUID_PROPERTIES
+  $FLUID_TYPE
+   WATER
+  $DENSITY
+   1 1000.0
+  $VISCOSITY
+   1 0.001
+  $HEAT_CAPACITY
+   1 0.0
+  $HEAT_CONDUCTIVITY
+   1 0.0
+  $PCS_TYPE
+   HEAD
+#STOP
+|-- Written with ogs5py (0.6.1) on: 2019-03-07_09-14-23 --|

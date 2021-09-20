@@ -1,0 +1,27 @@
+|-------------- Written with ogs5py --------------|
+#TIME_STEPPING
+  $PCS_TYPE
+   GROUNDWATER_FLOW
+  $TIME_START
+   4295
+  $TIME_END
+   5475
+  $TIME_STEPS
+   1180000 0.001
+  $TIME_UNIT
+  DAY
+#TIME_STEPPING
+  $PCS_TYPE
+   MASS_TRANSPORT
+  $TIME_START
+   0
+  $TIME_END
+   4295
+  $TIME_END
+   5475
+  $TIME_STEPS
+   1180000 0.001
+  $TIME_UNIT
+  DAY
+#STOP
+|-- Written with ogs5py (0.6.1) on: 2019-03-07_09-14-23 --|
