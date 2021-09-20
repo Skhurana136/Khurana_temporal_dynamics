@@ -1,4 +1,4 @@
-# Spatio-temporal_heterogeneities_saturated_zone_microbial_dynamics
+# Temporal uncertainty_saturated_zone_nutrient_cycling
 This work is associated with the following publication submitted for peer-review:
 Khurana et al. 2021. Should we worry about surficial dynamics when assessing nutrient cycling in the groundwater?. Frontiers in Water.
 Registration number: XX-XXXX-XX.
