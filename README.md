@@ -29,6 +29,36 @@ Registration number: XX-XXXX-XX.
 	
 ## Subdirectory Scripts
 - All_figures.py: Generates figures used in the manuscript using *.csv files in the Results subdirectory.
+- biomassdata_generation.py
+	- Processes simulation results to generate average mass contribution of each microbial subpopulation.
+	- Combines this with breakthrough time for each simulation scenario.
+	- Output file: biomass_Original_complete.csv.
+- biomassdata_comparison.py
+	- Normalizes mean mass contribution of each microbial subpopulation with that in steady state conditions.
+	- Output file: biomass_comparison_Original_complete.csv.
+- massfluxdata_generation.py
+	- Processes simulation results to derive the relative change in mass flux for all chemical species.
+	- Combines change in mass flux with tracer breakthrough time in each simulation scenario.
+	- Output file: massflux_complete_28022021.csv.
+- massfluxdata_comparison.py
+	- Normalizes change in mass flux with that in homogeneous domain at steady state conditions.
+	- Normalizes change in mass flux with that in steady state conditions.
+	- Output file: massflux_comparison_Original_complete_16062021.csv
+- temp_animation.py
+	- Script used to generate a video animation to visualize temporal dynamics in multiple heterogeneous domains.
+	- Output file: spatio-temp-dynamics.mp4
+- mass_flux_timeseries_generation_analysis.py
+	- Processes simulation results to derive the responsiveness of the chemical species in the system and associated backward traceability.
+	- Output files
+		- normalized_sensitivity_19022021.csv
+		- mass_flux_sensitivity_generalized_19022021.csv
+		- biomass_sensitivity_generalized_19022021.csv
+		- crosschor_memory_chem.csv
+- biomass_timeseries_generation_analysis.py
+	- Processes simulation results to assess responsiveness, cross-correlation and backward traceability of microbes in the system.
+	- Output files
+		- Normalized_RMSamplitude_biomass.csv
+		- crosschor_memory_biomass.csv
 	
 ## Subdirectory Results
 Information consistent throughout all the files:
@@ -39,15 +69,27 @@ Information consistent throughout all the files:
 - Column **Chem**: Reactive, or non-reactive, or microbial  species of concern.
 
 The processed results with some metadata information:
-- Da_BG.csv
-	- Column **Conc_in**: Flux averaged concentration of species at the inlet (uM).
-	- Column **Conc_out**: Flux averaged concentration of species at the outlet (uM).
-	- Column **Normconc**: Ratio of Conc_in and Conc_out.
-	- Column **base**: Normconc in the base case.
-	- Column **k**: Pseudo first order reaction rate constant (d-1).
-	- Column **tau**: Characteristic reaction time scale (d).
-	- Column **Da**: Estimated Damkohler number.
-	- Refer to massflux_comparison_steadystate_BG.csv for the description of the rest of the columns.
-- tracer_combined_05032020.csv
-	- Column **Time**: Breakthrough time (days)
-	- Column **fraction**: Ratio of breakthrough time in heterogeneous scenario and that in homogeneous scenario (base case)
+- CSV files:
+	- biomass_comparison_Original_complete - Aggregated results compared with base case
+	- biomass_Original_complete - Aggregated results
+	- biomass_sensitivity_generalized_19022021 - Responsiveness of biomass normalized by base case
+	- crosschor_memory_biomass - Time lag correlation analysis
+	- crosschor_memory_chem - Time lag correlation analysis
+	- Da_29012021_95pcloss - Damkohler number at steady state conditions
+	- Headat inlet - Variation of groundwater head at inlet
+	- mass_flux_sensitivity_generalized_19022021 - Responsiveness of chemical species normalized by base case
+	- massflux_comparison_Original_complete - Aggregated mass removal over 15 years compared with base case
+	- massflux_comparison_Original_complete_16062021 - Aggregated mass removal over 15 years compared with base case
+	- massflux_Original_complete - Aggregated mass removal of 15 years
+	- Normalized_RMSamplitude_biomass - Responsiveness of biomass
+	- Normalized_RMSamplitude_biomass_190022021 - Responsiveness of biomass
+	- Normalized_RMSamplitude_chem - Responsiveness of chemical species
+	- Normalized_RMSamplitude_chem_withloc - Responsiveness of chemical species
+	- normalized_sensivity_19022021 - Responsiveness of chemical species
+	- tracer_combined_05032020 - Tracer breakthrough at steady state conditions
+- HDF5 files:
+- Temporal_analysis_biomass - Time series of biomass of all simulation scenarios
+- Temporal_analysis_biomass_ratiopops - TIme series of biomass subpopulation ratios
+- Temporal_analysis_full_Dat - Time series of chemical concentration leaving the domain divided on the basis of chemical regime (Da)
+- Temporal_analysis_full_data - Time series of chemical concentrations leaving the domain of all scenarios
+- Temporal_analysis_regimes_Dat - Time series of chemical concentration leaving the domain divided on the basis of chemical regime (Da)
