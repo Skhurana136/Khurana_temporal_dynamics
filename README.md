@@ -29,33 +29,6 @@ Registration number: XX-XXXX-XX.
 	
 ## Subdirectory Scripts
 - All_figures.py: Generates figures used in the manuscript using *.csv files in the Results subdirectory.
-- massfluxdata_generation_steadystate.py:
-	- Processes the simulation results (numpy arrays) and outputs the mass flux at the inlet and outlet boundaries.
-	- The results are saved for all the reactive species in a *.csv file (see Results subdirectory).
-	- Access to functions in dsenvsci repository is required to run this script.
-	- Output file: massflux_steadystate_BG.csv
-- biomassdata_generate_steadystate.py:
-	- Processes the simulation results (numpy arrays) and outputs the biomass in the domain.
-	- The results are saved for all the reactive species in a *.csv file (see Results subdirectory).
-	- Access to functions in dsenvsci repository is required to run this script.
-	- Output file: biomass_steadystate_BG.csv
-- massfluxdata_comparison_steadystate.py:
-	- Compares the change in mass flux in all domains with that in the base case (homogeneous case) in each flow regime.
-	- Input file required: massflux_steadystate_BG.csv.
-	- Output file: massflux_comparison_steadystate_BG.csv
-- biomass_comparison_steadystate.py:
-	- Compares the biomass in all domains with that in the base case (homogeneous case) in each flow regime.
-	- Input file required: biomass_steadystate_BG.csv.
-	- Output file: biomass_comparison_steadystate_BG.csv
-- Tracer_studies_saturated_flow.py:
-	- Processes the tracer studies' simulation results (data set is large, and it can be made available upon request).
-	- Generates the breakthrough time in each scenario in each flow regime.
-	- Access to functions in dsenvsci repository is required to run this script.
-	- Output file: tracer_combined_05032020.csv
-- Calculating_Da_BG.ipynb:
-	- Processes the simulation results to generate the Damkohler number.
-	- Access to functions in dsenvsci repository is required to run this script.
-	- Output file: Da_BG.csv
 	
 ## Subdirectory Results
 Information consistent throughout all the files:
