@@ -4,6 +4,7 @@ Created on Sun Jun 28 17:36:05 2020
 
 @author: khurana
 """
+#%%
 # loading required libraries
 import os
 import pandas as pd
@@ -15,12 +16,14 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
-import plots.saturated_transient as stp
-import data_reader.data_processing as proc
+import DS.plots.saturated_transient as stp
+import DS.data_reader.data_processing as proc
 
-DIR = "C:/Users/khurana/Documents/Scripts/Khurana_temporal_dynamics"
+#%%
+# Set up directories
+DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 results_dir = os.path.join(DIR,"Results")
-sourcedatadir = "E:/Zenodo_temporal_dynamics"
+sourcedatadir = "D:/Data/Zenodo_temporal_dynamics"
 os.chdir(results_dir)
 
 legendkw = {'fontsize' : 14}
@@ -30,6 +33,9 @@ suptitlekw = {'fontsize' : 18}
 titlekw = {'fontsize' : 16}
 mpl.rc('font',family='Arial')
 
+#---- FIGURES ----
+
+#%%
 #----  Figure 1 Temporal variation: Chemical species ----
 
 # Define commonly used scenarios
@@ -38,15 +44,15 @@ reglist = ["Slow", "Medium", "Fast"]
 gvarnames = ["DO", "DOC", "Nitrate", "Ammonium"]#, "TOC", "Nitrogen"]
 imposedtimeseries = ["1","2","5"]
 Trial = proc.masterscenarios("Saturated").keys()
-blue_patch = mpatches.Patch(color="steelblue", label= 'log$_{10}$Da < -1', alpha = 0.5)
-orange_patch = mpatches.Patch(color = "orange", label =  '-1 < log$_{10}$Da < 0', alpha = 0.5)
-green_patch = mpatches.Patch(color="g", label='0 < log$_{10}$Da < 0.5', alpha = 0.5)
-red_patch = mpatches.Patch(color="indianred", label='log$_{10}$Da > 0.5', alpha = 0.5)
+blue_patch = mpatches.Patch(color="steelblue", label= 'log$_{10}$Da < -1', alpha = 0.8)
+orange_patch = mpatches.Patch(color = "orange", label =  '-1 < log$_{10}$Da < 0', alpha = 0.8)
+green_patch = mpatches.Patch(color="g", label='0 < log$_{10}$Da < 0.5', alpha = 0.8)
+red_patch = mpatches.Patch(color="indianred", label='log$_{10}$Da > 0.5', alpha = 0.8)
 patchlist = [blue_patch, orange_patch, green_patch, red_patch]
 
 # Define plotting related parameters
 colorlist = ["indianred", "g", "steelblue"]
-PeDapalette = {0: "blue", 1: "orange", 2: "g", 3: "indianred"}
+PeDapalette = {0: "steelblue", 1: "orange", 2: "g", 3: "indianred"}
 
 # Generate Dat from Da and Pe
 data  = pd.read_csv("Da_29012021_95pcloss.csv", sep=",")
@@ -76,6 +82,8 @@ basedata = np.load(os.path.join(sourcedatadir, "SlowAR_0_NS-AH_df.npy"))
 basevelocity = np.mean(basedata[2, -1, :, :])
 hr = h5py.File("Temporal_analysis_full_data.h5", mode = 'r')
 fig,ax = plt.subplots(2,2, figsize = (7,7), sharex = True, sharey = True)
+for a,b in zip(ax.flat[:], ["A", "B", "C", "D"]):
+    a.text(0.1, 10, b, c = "black", fontsize = 'xx-large')
 for danum in [0,1,2,3]:
     n_danum = []
     vel_all3 = []
@@ -101,7 +109,7 @@ for danum in [0,1,2,3]:
                     if ((j == '52' and t == "5") or (j == '43' and t == "1")):
                         pass
                     elif int(colorcriteria[j+r+g+"0"]) == danum:
-                        n = hr.get(t + "/" + Reg + "/" + j + "/" + g).value
+                        n = hr.get(t + "/" + Reg + "/" + j + "/" + g)[:]
                         n_danum.append(n)
                         n_danumt.append(n)
                     else:
@@ -130,12 +138,17 @@ plt.legend(handles=patchlist, ncol = 2,
 picname = "Figure1_temp_variation_chem.jpg"
 plt.savefig(picname, dpi=300, bbox_inches="tight", pad=0.1)
 
+#%%
 # Figure 2: Time series: chemical
 #Characteristic to plot:
 features = ["median"]
 featurestyle = ["solid"]
 imposedtimeseries = ["1","2","5"]
 veline = mlines.Line2D([], [], linestyle = 'solid', color='grey', markersize=15, label='Velocity')
+da0 = mlines.Line2D([], [], linestyle = 'solid', color='steelblue', markersize=15, label='log$_{10}$Da < -1')
+da1 = mlines.Line2D([], [], linestyle = 'solid', color='orange', markersize=15, label='-1 < log$_{10}$Da < 0')
+da2 = mlines.Line2D([], [], linestyle = 'solid', color='g', markersize=15, label='0 < log$_{10}$Da < 0.5')
+da3 = mlines.Line2D([], [], linestyle = 'solid', color='indianred', markersize=15, label='log$_{10}$Da > 0.5')
 
 #Load dataset for time series in terms of Dat
 hr = h5py.File("Temporal_analysis_full_Dat.h5", mode = 'r')
@@ -143,6 +156,10 @@ hr = h5py.File("Temporal_analysis_full_Dat.h5", mode = 'r')
 basedata = np.load(os.path.join(sourcedatadir, "SlowAR_0_NS-AH_df.npy"))
 basevelocity = np.mean(basedata[2, -1, :, :])
 fig, ax = plt.subplots(4, 3, figsize = (16,8), sharey = True, sharex = True)
+for col,num in zip ([0,1,2],imposedtimeseries):
+    for a,b in zip(ax[:,col], ["A", "B", "C", "D"]):
+        a.text(0.2, 2.0, b+num, c = "black", fontsize = 'large')
+
 for t in imposedtimeseries:
     for j in ["37"]:
         data = np.load(os.path.join(sourcedatadir,"SlowAR_" + t+"_NS-A"+j+"_df.npy"))
@@ -153,22 +170,20 @@ for t in imposedtimeseries:
         axidx = Dat*len(imposedtimeseries) + imposedtimeseries.index(t)
         a = ax.flat[axidx]
         for datafeature,featureline in zip(features,featurestyle):
-            n = hr.get(t + "/Dat" + str(Dat) + "/"+datafeature+"/").value
-            nmin = hr.get(t + "/Dat" + str(Dat) + "/q25/").value
-            nmax = hr.get(t + "/Dat" + str(Dat) + "/q75/").value
+            n = hr.get(t + "/Dat" + str(Dat) + "/"+datafeature+"/")[:]
+            nmin = hr.get(t + "/Dat" + str(Dat) + "/q25/")[:]
+            nmax = hr.get(t + "/Dat" + str(Dat) + "/q75/")[:]
             print(np.shape(n))
             a.plot(n[1:], label = labels[Dat], color = PeDapalette[Dat], linestyle=featureline)
             a.fill_between(np.asarray(list(range(1095))),nmin, nmax, color = PeDapalette[Dat], alpha = 0.4)
+            a.tick_params(labelsize = 14)
         if axidx <3:
             a.set_title("Time series: T"+ t, fontsize = 16)
-        if axidx%3==2:
-            a.legend(loc="upper left", fontsize = 14)
-        if Dat==3:
-            a.tick_params(labelsize = 14)
 plt.xticks((0,365,730,1095), (0,5,10,15))
-legend_flow = fig.legend(handles=[veline], fontsize = 14,
-                         bbox_to_anchor=(0.75, 0.06),loc="center")
-plt.gca().add_artist(legend_flow)
+legend_all = fig.legend(handles=[da0, da1, da2, da3, veline],
+                        fontsize = 14, bbox_to_anchor=(0.5, 0.0),
+                         ncol=5,loc="center")
+plt.gca().add_artist(legend_all)
 plt.annotate("Ratio with respect to steady state conditions",
         xy=(-2.6, 2.25),
         xytext=(0, 0),
@@ -192,6 +207,7 @@ picname = "Figure2_Chem_time_series.jpg"
 plt.savefig(picname, dpi = 300, bbox_inches = 'tight', pad_inches = 0.1)
 hr.close()
 
+#%%
 # Figure 3: Temporal variation: Microbial species
 regmapcolors = {"Slow":plt.cm.Reds, "Equal":plt.cm.Greens, "Fast":plt.cm.Blues}
 basedata = np.load(os.path.join(sourcedatadir, "SlowAR_0_NS-AH_df.npy"))
@@ -200,8 +216,12 @@ ratio_plot = ["State_Ratio", "Location_Ratio"]
 hrsubratio = h5py.File("Temporal_analysis_biomass_ratiopops.h5", mode = 'r')
 #hr = hrsubpops
 fig,ax = plt.subplots(nrows = 2, ncols = 3, figsize = (6,4), sharex = True, sharey = True)
+for row,num in zip ([0,1],["1", "2"]):
+    for a,b in zip(ax[row,:], ["A", "B", "C"]):
+        a.text(0.2, 1.7, b+num, c = "black", fontsize = 'large')
 ax.flat[0].set_ylabel(r"$\frac{Active}{Inactive}^\ast$", fontsize = 14)
 ax.flat[3].set_ylabel(r"$\frac{Immobile}{Mobile}^\ast$", fontsize = 14)
+
 for g in ratio_plot:
     grow = ratio_plot.index(g)
     hr = hrsubratio
@@ -220,7 +240,7 @@ for g in ratio_plot:
                 if ((j == '52' and t == "5") or (j == '43' and t == "1")):
                     pass
                 else:
-                    n = hr.get("Norm_"+t + "/" + Reg + "/" + j + "/" + g).value
+                    n = hr.get("Norm_"+t + "/" + Reg + "/" + j + "/" + g)[:]
                     n_reg.append(n)
             datapv = np.asarray(n_reg).transpose()
             x_plot = np.tile(velocity[1:], np.shape(datapv)[1])
@@ -242,6 +262,7 @@ plt.savefig("Figure3_Temp_variation_biomass_ratios.jpg",
             dpi=300, bbox_inches="tight", pad=0.1)
 hr.close()
 
+#%%
 #Figure 4 Amplitude - Heterogeneous case
 mymarklist = ["o", "^", "s", "d"]
 colorlist = ["steelblue", "orange","g", "indianred"]
@@ -279,6 +300,7 @@ plt.legend(fontsize = 14)
 picname = "Figure4_logDa_Normalized_Amplitude_chem.jpg"
 plt.savefig(picname, dpi = 300, bbox_inches = 'tight', pad_inches = 0.1)
 
+#%%
 #Figure 5: Normalised Amplitude: Biomass
 filename = "biomass_sensitivity_generalized_19022021.csv"
 
@@ -295,6 +317,8 @@ markerseries = ["d", "^", "o"]
 colorlist = ["indianred", "g", "steelblue"]
 
 fig, axes = plt.subplots(nrows=3, ncols=1, figsize=[8, 8], sharex=True, sharey = True)
+for a,b in zip(axes.flat[:], ["A", "B", "C"]):
+    a.text(0.12, 1.0, b, c = "black", fontsize = 'xx-large')
 for k in Chemseries:
     dfc = data[(data["Chem"] == k)]
     colidx1 = Chemseries.index(k)
@@ -311,14 +335,15 @@ for k in Chemseries:
         a.tick_params(axis="y", labelsize=15)
         a.tick_params(axis="x", labelsize=15)
         if colidx1==2:
-            a.legend(title = "Flow regime", title_fontsize = 12, fontsize = 12, loc = "best")
+            a.legend(title = "Flow regime", title_fontsize = 12, fontsize = 12,
+            bbox_to_anchor=(0.9, -0.35), ncol = 3)# loc = "best")
             a.set_xlabel("Residence time of solutes (days)",fontsize =18)
         else:
             le2 = a.legend([])
             le2.remove()
 plt.xscale("log")
 plt.xticks((0.1,1,10,100), (0.1,1,10,100))
-#plt.legend(fontsize = 12)
+
 for ax, typsp in zip(axes, species):
     ax.set_title(typsp, fontsize=15)
 axes.flat[1].set_ylabel("Normalised Responsiveness", fontsize = 18)
@@ -326,7 +351,7 @@ plt.savefig("Figure5_biomass_normalized_amplitude.jpg",
     dpi=300,
     bbox_inches="tight",
     pad=0.1)
-
+#%%
 #Figure S1: Autocorrelation discussion for imposed temporal dynamics
 
 head_path = "headatinlet.csv"
